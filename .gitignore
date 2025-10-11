@@ -1,0 +1,7 @@
+testpreprocess.py
+testqdrant.py
+/qdrant_db
+review.pkl
+qdrant
+requirements.txt
+/.venv
