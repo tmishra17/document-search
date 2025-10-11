@@ -5,3 +5,4 @@ review.pkl
 qdrant
 requirements.txt
 /.venv
+DocumentSearchEngine2.py
