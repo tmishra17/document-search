@@ -56,7 +56,6 @@ Uses AI to understand the meaning of your search, not just keywords. Searches th
 - Enter your search query (e.g., "funny romantic comedy")  
 - Adjust similarity threshold to control result relevance
 - View matching reviews with similarity scores
-```
 
 ### **5. Intelligent Search** 🎯
 ```python
@@ -135,7 +134,7 @@ streamlit run DocumentSearchEngine.py
 - **Scalability**: Production-ready for millions of vectors  
 - **Persistence**: Data survives crashes and restarts
 
-### **Sentiment Analysis Pipeline:**
+<!-- ### **Sentiment Analysis Pipeline:**
 ```python
 # Uses HuggingFace transformer pipeline
 classifier = pipeline("sentiment-analysis")
@@ -143,7 +142,7 @@ classifier = pipeline("sentiment-analysis")
 # For each review:
 result = classifier(review_text[:512])  # Truncate for model limits
 # Returns sentiment + confidence score
-```
+``` -->
 
 ## 📊 **Example Queries That Work Well**
 

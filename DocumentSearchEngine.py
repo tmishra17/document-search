@@ -10,7 +10,12 @@ from qdrant_client import QdrantClient, models
 from transformers import pipeline
 
 client = QdrantClient("localhost", port=6333)
+# when I get the classifier score I need to see how it
+# fit into my code, how about tomorrow I figure out how to
+# do this tomorrow and come up with a plan
+# maybe come up with pseudocode as well
 classifier = pipeline("sentiment-analysis")
+
 # need to query IMDB Kaggle database
 def preprocess_review(text: str) -> str:
     """Removes unwanted HTML from the provided text
@@ -25,7 +30,7 @@ def preprocess_review(text: str) -> str:
 
 # need a sentiment classifier so that score gets ranked by positive reviews
 BATCH_SIZE = 1000
-MODEL_NAME = "mixedbread-ai/mxbai-embed-large-v1"
+MODEL_NAME = "all-MiniLM-L6-v2"
 EMBEDDING_PATH = "/home/tmishra/my_space/document_project/review.pkl"
 # Text Embedder
 DB_PATH = "/home/tmishra/my_space/document_project/IMDB_Dataset.csv"
@@ -34,7 +39,7 @@ model = SentenceTransformer(MODEL_NAME)
 def index_values() -> tuple[torch.Tensor, pd.DataFrame]:
     status = st.empty()
     if os.path.exists(EMBEDDING_PATH):
-        status = st.info("Getting review embeddings...")
+        status.info("Getting review embeddings...")
         with open(EMBEDDING_PATH, "rb") as pkl:
             text_embeddings, full_df = pickle.load(pkl)
         
@@ -47,8 +52,14 @@ def index_values() -> tuple[torch.Tensor, pd.DataFrame]:
         all_text_embeddings = []
         df_list = []
         for chunk in chunks:
-            print(f"Applied Review {chunks['review']}")
+             # Fix 1: Clean the text first
+            # chunk['review'] = chunk['review'].apply(preprocess_review)
             
+            # Fix 2: Add sentiment analysis correctly
+            chunk['sentiment'] = chunk['review'].apply(lambda x: classifier(x[:512])[0]['label'])
+            chunk['sentiment_score'] = chunk['review'].apply(lambda x: classifier(x[:512])[0]['score'])
+            
+            # pass in sentiment and review so that we can analyze meaning
             text_embeddings = model.encode(chunk['review'].tolist(), 
                                         batch_size=BATCH_SIZE,
                                         convert_to_tensor = True,
@@ -75,15 +86,26 @@ def semantic_search(query: str,
                     threshold: float, 
                     max_results: int, 
                     chunks: pd.DataFrame) -> list:
+    query_sentiment = classifier(query)[0]['label']
     query_embedding = model.encode(query, convert_to_tensor=True)
     search_results = util.semantic_search(query_embedding, text_embeddings, top_k=int(max_results))[0]
+    
     filtered_results = []
     for res in search_results:
         if res['score'] >= float(threshold):
             id = res['corpus_id']
             row_data = chunks.iloc[id].to_dict()
-            filtered_results.append({"review": row_data['review'], "score": res['score']})
-    return filtered_results
+            
+            # Simple sentiment boost
+            sentiment_boost = 0.1 if row_data['sentiment'] == query_sentiment else 0
+            final_score = res['score'] + sentiment_boost
+            
+            filtered_results.append({
+                "review": row_data['review'], 
+                "score": final_score,
+                "sentiment": row_data['sentiment']
+            })
+    return sorted(filtered_results, key=lambda x: x['score'], reverse=True)
 
 # how would I parse my database in docling, make individual indices of each one, and then 
 
