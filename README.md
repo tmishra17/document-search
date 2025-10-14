@@ -1,4 +1,4 @@
-# Movie Review Search Engine
+# Awesome Move Finder
 
 A semantic search application for movie reviews using AI embeddings and sentiment analysis.
 
