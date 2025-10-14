@@ -55,6 +55,3 @@ streamlit run DocumentSearchEngine.py
 - **First run slow**: Normal - processing takes time
 - **No results**: Lower similarity threshold (try 0.2-0.3)
 - **Memory issues**: App uses CPU mode automatically
-
-## Contributing
-Feel free to submit issues and enhancement requests!

@@ -8,6 +8,7 @@ import pandas as pd
 import re
 from qdrant_client import QdrantClient, models
 from transformers import pipeline
+import chonkie as ck
 
 client = QdrantClient("localhost", port=6333)
 # when I get the classifier score I need to see how it
@@ -15,6 +16,21 @@ client = QdrantClient("localhost", port=6333)
 # do this tomorrow and come up with a plan
 # maybe come up with pseudocode as well
 classifier = pipeline("sentiment-analysis")
+
+
+def upload_to_qdrant(text_embeddings: torch.Tensor, collection_name: str = "movie_reviews"):
+    client.create_collection(
+        collection_name,
+        vectors_config={
+            "text_embedding": models.VectorParams(
+                size=384,  # Dimension of text embeddings
+                distance=models.Distance.COSINE,  # Cosine similarity is used for comparison
+            ),
+        },
+     )
+    st.info("Uploading to Qdrant... ")
+    upload_batch_size = 100
+    
 
 # need to query IMDB Kaggle database
 def preprocess_review(text: str) -> str:
@@ -35,6 +51,7 @@ EMBEDDING_PATH = "/home/tmishra/my_space/document_project/review.pkl"
 # Text Embedder
 DB_PATH = "/home/tmishra/my_space/document_project/IMDB_Dataset.csv"
 model = SentenceTransformer(MODEL_NAME)
+
 @st.cache_data
 def index_values() -> tuple[torch.Tensor, pd.DataFrame]:
     status = st.empty()
@@ -64,7 +81,7 @@ def index_values() -> tuple[torch.Tensor, pd.DataFrame]:
                                         batch_size=BATCH_SIZE,
                                         convert_to_tensor = True,
                                         convert_to_numpy = False
-                                        )
+                                    )
             
             df_list.append(chunk)
             all_text_embeddings.append(text_embeddings)
@@ -81,6 +98,7 @@ def index_values() -> tuple[torch.Tensor, pd.DataFrame]:
         status.success("Successfully loaded embeddings")
         status.empty()
         return text_embeddings, full_df
+    
 def semantic_search(query: str, 
                     text_embeddings: torch.Tensor, 
                     threshold: float, 
