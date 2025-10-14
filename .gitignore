@@ -6,3 +6,6 @@ qdrant
 requirements.txt
 /.venv
 DocumentSearchEngine2.py
+__pycache__/
+*.pyc
+*.pyo
