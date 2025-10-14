@@ -1,4 +1,4 @@
-# 😃 Awesome Move Finder
+# 😃 Awesome Movie Finder
 
 A semantic search application for movie reviews using AI embeddings and sentiment analysis.
 
