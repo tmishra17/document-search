@@ -8,7 +8,7 @@ import pandas as pd
 import re
 from qdrant_client import QdrantClient, models
 from transformers import pipeline
-import chonkie as ck
+from chonkie import SentenceChunker
 
 client = QdrantClient("localhost", port=6333)
 # when I get the classifier score I need to see how it
@@ -17,8 +17,10 @@ client = QdrantClient("localhost", port=6333)
 # maybe come up with pseudocode as well
 classifier = pipeline("sentiment-analysis")
 
+chunker = SentenceChunker(chunk_size=400, chunk_overlap=50)
 
 def upload_to_qdrant(text_embeddings: torch.Tensor, collection_name: str = "movie_reviews"):
+    # finish qdrant upload code tomorrow, need to also improve sentiment analysis with a different model
     client.create_collection(
         collection_name,
         vectors_config={

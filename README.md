@@ -21,9 +21,6 @@ Uses AI to understand the meaning of your search, not just keywords. Combines se
 ```bash
 # Download dataset
 kaggle datasets download lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
-
-# Install dependencies  
-pip install -r requirements.txt
 ```
 
 ### Run the Application
