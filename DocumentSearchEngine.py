@@ -8,6 +8,7 @@ import pandas as pd
 import re
 from qdrant_client import QdrantClient, models
 from transformers import pipeline
+from chonkie import SentenceChunker
 
 client = QdrantClient("localhost", port=6333)
 # when I get the classifier score I need to see how it
@@ -35,6 +36,13 @@ EMBEDDING_PATH = "/home/tmishra/my_space/document_project/review.pkl"
 # Text Embedder
 DB_PATH = "/home/tmishra/my_space/document_project/IMDB_Dataset.csv"
 model = SentenceTransformer(MODEL_NAME)
+
+# Initialize Chonkie chunker for intelligent review chunking
+chunker = SentenceChunker(
+    chunk_size=512,  # Maximum tokens per chunk
+    chunk_overlap=50,  # Overlap between chunks to maintain context
+    min_sentences_per_chunk=2  # Minimum sentences in each chunk
+)
 @st.cache_data
 def index_values() -> tuple[torch.Tensor, pd.DataFrame]:
     status = st.empty()
@@ -51,23 +59,44 @@ def index_values() -> tuple[torch.Tensor, pd.DataFrame]:
         chunks = pd.read_csv("IMDB_Dataset.csv", chunksize=BATCH_SIZE)
         all_text_embeddings = []
         df_list = []
+        
         for chunk in chunks:
-             # Fix 1: Clean the text first
-            # chunk['review'] = chunk['review'].apply(preprocess_review)
+            # Process each review with Chonkie chunker
+            chunk_rows = []
+            chunk_texts = []
             
-            # Fix 2: Add sentiment analysis correctly
-            chunk['sentiment'] = chunk['review'].apply(lambda x: classifier(x[:512])[0]['label'])
-            chunk['sentiment_score'] = chunk['review'].apply(lambda x: classifier(x[:512])[0]['score'])
+            for idx, row in chunk.iterrows():
+                review_text = preprocess_review(row['review'])
+                
+                # Use Chonkie to intelligently chunk long reviews
+                review_chunks = chunker.chunk(review_text)
+                
+                # Get sentiment for the original review
+                sentiment = classifier(review_text[:512])[0]['label']
+                sentiment_score = classifier(review_text[:512])[0]['score']
+                
+                # Create a row for each chunk
+                for chunk_obj in review_chunks:
+                    chunk_rows.append({
+                        'review': chunk_obj.text,
+                        'original_review': row['review'],
+                        'sentiment': sentiment,
+                        'sentiment_score': sentiment_score,
+                        'chunk_index': chunk_obj.start_index,
+                        'is_chunked': len(review_chunks) > 1
+                    })
+                    chunk_texts.append(chunk_obj.text)
             
-            # pass in sentiment and review so that we can analyze meaning
-            text_embeddings = model.encode(chunk['review'].tolist(), 
-                                        batch_size=BATCH_SIZE,
-                                        convert_to_tensor = True,
-                                        convert_to_numpy = False
-                                        )
-            
-            df_list.append(chunk)
-            all_text_embeddings.append(text_embeddings)
+            # Create embeddings for all chunks in this batch
+            if chunk_texts:
+                text_embeddings = model.encode(chunk_texts, 
+                                            batch_size=BATCH_SIZE,
+                                            convert_to_tensor=True,
+                                            convert_to_numpy=False
+                                            )
+                
+                df_list.append(pd.DataFrame(chunk_rows))
+                all_text_embeddings.append(text_embeddings)
         
         # Step 1: Combine all embeddings from chunks into one tensor
         text_embeddings = torch.cat(all_text_embeddings)
