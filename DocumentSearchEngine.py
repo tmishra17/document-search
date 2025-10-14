@@ -27,7 +27,7 @@ def preprocess_review(text: str) -> str:
     Returns:
         str: review with removed HTML
     """
-    return re.sub(r'<br\s*?>', '\n', text, flags=re.IGNORECASE)
+    return re.sub(r'<br\s*/?>', '\n', text, flags=re.IGNORECASE)
 
 # need a sentiment classifier so that score gets ranked by positive reviews
 BATCH_SIZE = 1000
