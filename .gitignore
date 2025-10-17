@@ -6,3 +6,8 @@ qdrant
 requirements.txt
 /.venv
 DocumentSearchEngine2.py
+chonkie_ex.py
+test_qdrant.py
+qdrant_storage
+IMDB_Dataset.csv
+imdb_top_1000.csv

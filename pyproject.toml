@@ -8,6 +8,7 @@ dependencies = [
     "icontract>=2.7.1",
     "kaggle>=1.7.4.5",
     "loguru>=0.7.3",
+    "nltk>=3.9.2",
     "qdrant-client>=1.15.1",
     "sentence-transformers>=5.1.1",
     "siglib>=0.1.0",
