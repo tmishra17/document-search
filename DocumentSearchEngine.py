@@ -17,7 +17,7 @@ client = QdrantClient("localhost", port=6333)
 # do this tomorrow and come up with a plan
 # maybe come up with pseudocode as well
 
-
+# 
 
 # need a sentiment classifier so that score gets ranked by positive reviews
 BATCH_SIZE = 1000

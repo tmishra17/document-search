@@ -46,9 +46,9 @@ streamlit run DocumentSearchEngine.py
 4. **Balanced Results** - Semantic relevance remains primary factor
 
 ### Example Queries
-- `"amazing thriller movie"` → boosts positive thriller reviews
+- `"amazing thriller movie"` → shows positive thriller reviews
 - `"terrible horror film"` → prioritizes negative horror reviews  
-- `"okay romantic comedy"` → neutral sentiment, minimal boost
+- `"okay romantic comedy"` → neutral sentiment, gives mediums ranked romantic comedies
 
 ## Troubleshooting
 
@@ -58,3 +58,10 @@ streamlit run DocumentSearchEngine.py
 
 ## Contributing
 Feel free to submit issues and enhancement requests!
+
+## Additional Features Coming Soon
+- Handling more complex queries (e.g. Funny movies with bad acting)
+- Recommending movie instead of reviews 
+- More complex sentiment analysis (responses that are slighly positive, slightly negative, neutral)
+
+
