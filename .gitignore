@@ -11,3 +11,6 @@ test_qdrant.py
 qdrant_storage
 IMDB_Dataset.csv
 imdb_top_1000.csv
+gemini_notes.txt
+The_Movies_DB
+ShahshiTharoor.py

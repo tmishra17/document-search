@@ -4,7 +4,7 @@ A semantic search application for movie reviews using AI embeddings and sentimen
 
 ## How it Works
 
-Uses AI to understand the meaning of your search, not just keywords. Combines semantic similarity with intelligent sentiment matching to find the most relevant reviews.
+Uses AI to understand the meaning of your search, not just keywords. Combines semantic similarity with intelligent sentiment matching to find the most relevant reviews. Embeddings stored via qdrant vector database.
 
 ## Features
 
